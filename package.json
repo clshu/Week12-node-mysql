@@ -1,0 +1,27 @@
+{
+  "name": "week12-node-mysql",
+  "version": "1.0.0",
+  "description": "Node.js / npm mysql / npm inquirer",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clshu/Week12-node-mysql.git"
+  },
+  "keywords": [
+    "mysql",
+    "inquirer"
+  ],
+  "author": "Chin-Long Shu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/clshu/Week12-node-mysql/issues"
+  },
+  "homepage": "https://github.com/clshu/Week12-node-mysql#readme",
+  "dependencies": {
+    "inquirer": "1.2.2",
+    "mysql": "2.11.1"
+  }
+}
