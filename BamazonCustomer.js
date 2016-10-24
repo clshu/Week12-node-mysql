@@ -1,6 +1,8 @@
 const mysql     = require('mysql');
 const inquirer  = require('inquirer');
 const util      = require('util');
+const printf    = require('printf');
+const my_util   = require('./my_util');
 
 var connection = mysql.createConnection({
   host     : 'localhost',
@@ -17,14 +19,18 @@ var originalResult;
 
 function displayProducts(result) {
   var str;
-  console.log('+---------+---------------+---------+');
-  console.log('| item_id | product_name  | price   |');
-  console.log('+---------+-------------------------+');
+  var idLength = 7;
+  var nameLength = 38;
+  
+
+  console.log('+---------+----------------------------------------+-----------+');
+  console.log('| item_id | product_name                           |   price   |');
+  console.log('+---------+----------------------------------------------------+');
   result.forEach(function (item) {
-    str = util.format('| %s | %s | %d |', item.item_id, item.product_name, item.price);
+    str = printf('| %7s | %38s | % 9.2f |', my_util.pad(item.item_id, idLength), my_util.pad(item.product_name, nameLength), item.price);
     console.log(str);
   });
-  console.log('+-----------------------------------+');
+  console.log('+--------------------------------------------------------------+');
 }
 
 function askCustomerInput (list) {
@@ -67,7 +73,7 @@ function askCustomerInput (list) {
         remainingQuantity = result[0].stock_quantity - parseInt(request.quantity);
  
         if (remainingQuantity < 0) {
-          console.log('Insufficient quantity! Request ' + request.quantity + ' units, only ' + result[0].stock_quantity + ' units available.\n');
+          console.log('\nInsufficient quantity! Request ' + request.quantity + ' units, only ' + result[0].stock_quantity + ' units available.\n');
           askCustomerInput(list);
         } else {
           connection.query('UPDATE Products SET stock_quantity=? WHERE item_id=?', [remainingQuantity, request.item_id], function(err, updateResult) {
@@ -84,7 +90,8 @@ function askCustomerInput (list) {
                return;
               }
               console.log('\nRequested item_id: ' + request.item_id.toUpperCase() + ' | Name: ' + newResult[0].product_name);
-              console.log('Request quantity: ' + request.quantity + ' Available Quantity: ' + originalResult.stock_quantity + ' Remaining Quantity: ' + newResult[0].stock_quantity);
+              console.log('Requested Quantity: ' + request.quantity + ' Available Quantity: ' + originalResult.stock_quantity + ' Remaining Quantity: ' + newResult[0].stock_quantity);
+              console.log('');
               connection.end();
               return;
             });
