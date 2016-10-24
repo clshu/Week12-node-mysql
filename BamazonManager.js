@@ -26,7 +26,7 @@ function displayProducts(result) {
     str = printf('| %7s | %36s | %7d | % 9.2f |', my_util.pad(item.item_id, idLength), my_util.pad(item.product_name, nameLength), item.stock_quantity, item.price);
     console.log(str);
   });
-  console.log('+------------------------------------------------+---------+-----------+');
+  console.log('+---------+--------------------------------------+---------+-----------+');
 }
 function viewProducts () {
   connection.query('SELECT item_id, product_name, price, stock_quantity FROM Products', function(err, result) {

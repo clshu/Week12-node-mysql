@@ -29,7 +29,7 @@ function displayProducts(result) {
     str = printf('| %7s | %38s | % 9.2f |', my_util.pad(item.item_id, idLength), my_util.pad(item.product_name, nameLength), item.price);
     console.log(str);
   });
-  console.log('+--------------------------------------------------+-----------+');
+  console.log('+---------+----------------------------------------+-----------+');
 }
 
 function askCustomerInput (list) {
