@@ -1,6 +1,5 @@
 const mysql     = require('mysql');
 const inquirer  = require('inquirer');
-const util      = require('util');
 const printf    = require('printf');
 const my_util   = require('./my_util');
 
