@@ -30,6 +30,11 @@ function displayProducts(result) {
 }
 function viewProducts () {
   connection.query('SELECT item_id, product_name, price, stock_quantity FROM Products', function(err, result) {
+    if (err) {
+        console.log(err)
+        connection.end();
+        return ;
+    }
     displayProducts(result);
     connection.end();
   });
@@ -37,6 +42,11 @@ function viewProducts () {
 }
 function viewLowInventory () {
   connection.query('SELECT item_id, product_name, price, stock_quantity FROM Products WHERE stock_quantity < 5', function(err, result) {
+    if (err) {
+        console.log(err)
+        connection.end();
+        return ;
+    }
     displayProducts(result);
     connection.end();
   });
@@ -45,12 +55,18 @@ function viewLowInventory () {
 
 function addInventoryWrapper () {
   connection.query('SELECT item_id, product_name, price, stock_quantity FROM Products', function(err, result) {
+    if (err) {
+        console.log(err)
+        connection.end();
+        return ;
+    }
     displayProducts(result);
-    addInventory();
+    var list = my_util.itemIdList(result);
+    addInventory(list);
   });
 }
 
-function addInventory () {
+function addInventory (list) {
   
   inquirer.prompt([
     {
@@ -60,13 +76,25 @@ function addInventory () {
     },
     {
       type: "input",
-      message: "Enter Quantity: ",
+      message: "Add More Quantity: ",
       name: "quantity",
+      validate: function(value) {
+            if (isNaN(value) == false) {
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
   ]).then(function (request) {
-    connection.query('UPDATE Products SET ? WHERE item_id=?',[{
-     stock_quantity: request.quantity
-    }, request.item_id], function (error, result) {
+    if (list.indexOf(request.item_id.toUpperCase()) == -1) {
+      console.log('\nInvalid item_id: ' + request.item_id + '\n');
+      addInventory(list);
+      return;
+    }
+
+    connection.query('UPDATE Products SET stock_quantity=stock_quantity + ? WHERE item_id=?',
+      [request.quantity, request.item_id], function (error, result) {
       if (error) {
         console.log(error)
         connection.end();
@@ -76,6 +104,11 @@ function addInventory () {
       console.log('\nUpdating Product is a SUCCESS!\n');
 
       connection.query('SELECT item_id, product_name, price, stock_quantity FROM Products WHERE item_id=?', request.item_id, function(err, result) {
+        if (err) {
+          console.log(err)
+          connection.end();
+          return ;
+        }
         displayProducts(result);
         connection.end();
       });
@@ -106,15 +139,29 @@ function addNewProduct () {
       type: "input",
       message: "Price: ",
       name: "price",
+      validate: function(value) {
+            if (isNaN(value) == false) {
+                return true;
+            } else {
+                return false;
+            }
+        }
     },
     {
       type: "input",
       message: "Quantity: ",
       name: "quantity",
+      validate: function(value) {
+            if (isNaN(value) == false) {
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
   ]).then(function (request) {
     connection.query('INSERT INTO Products SET ?',{
-     item_id: request.item_id,
+     item_id: request.item_id.toUpperCase(),
      product_name: request.product_name,
      department_name: request.department_name,
      price: request.price,

@@ -11,3 +11,10 @@ module.exports.pad = function (str, length) {
   }
   return newStr;
 }
+
+module.exports.itemIdList = function (result) {
+    var list = result.map(function (item) {
+        return item.item_id;
+    });
+    return list;
+}

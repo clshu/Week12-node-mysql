@@ -57,7 +57,7 @@ function askCustomerInput (list) {
   ]).then(function (request) {
 
     if (list.indexOf(request.item_id.toUpperCase()) == -1) {
-      console.log('Invalid item_id: ' + request.item_id);
+      console.log('\nInvalid item_id: ' + request.item_id + '\n');
       askCustomerInput(list);
     } else {
       connection.query('SELECT stock_quantity FROM Products WHERE item_id=?', request.item_id, function(err, result) {
@@ -112,10 +112,7 @@ connection.query('SELECT item_id, product_name, price FROM Products', function(e
   }
   
   displayProducts(result);
-  var list = result.map(function(item) {
-          return item.item_id;
-  });
-
+  var list = my_util.itemIdList(result);
   askCustomerInput(list);
 
 });
