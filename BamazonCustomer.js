@@ -95,6 +95,7 @@ function askCustomerInput (list) {
               }
               console.log('\nRequested item_id: ' + request.item_id.toUpperCase() + ' | Name: ' + newResult[0].product_name);
               console.log('Requested Quantity: ' + request.quantity + ' Available Quantity: ' + originalResult.stock_quantity + ' Remaining Quantity: ' + newResult[0].stock_quantity);
+              console.log('Cost: $' + sales);
               console.log('');
               connection.end();
               return;
