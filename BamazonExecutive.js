@@ -27,6 +27,7 @@ function displayDepartments(result) {
   });
   console.log('+---------+----------------------+---------+-------------+-------------+');
 }
+
 function displayDepartmentsShort(result) {
   var str;
   var nameLength = 20;
@@ -54,82 +55,6 @@ function viewProductSales () {
     connection.end();
   });
 
-}
-function viewLowInventory () {
-  connection.query('SELECT item_id, product_name, price, stock_quantity FROM Products WHERE stock_quantity < 5', function(err, result) {
-    if (err) {
-        console.log(err)
-        connection.end();
-        return ;
-    }
-    displayProducts(result);
-    connection.end();
-  });
-
-}
-
-function addInventoryWrapper () {
-  connection.query('SELECT item_id, product_name, price, stock_quantity FROM Products', function(err, result) {
-    if (err) {
-        console.log(err)
-        connection.end();
-        return ;
-    }
-    displayProducts(result);
-    var list = my_util.itemIdList(result);
-    addInventory(list);
-  });
-}
-
-function addInventory (list) {
-  
-  inquirer.prompt([
-    {
-      type: "input",
-      message: "Enter Product Item ID to Add More: ",
-      name: "item_id",
-    },
-    {
-      type: "input",
-      message: "Add More Quantity: ",
-      name: "quantity",
-      validate: function(value) {
-            if (isNaN(value) == false) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-    }
-  ]).then(function (request) {
-    if (list.indexOf(request.item_id.toUpperCase()) == -1) {
-      console.log('\nInvalid item_id: ' + request.item_id + '\n');
-      addInventory(list);
-      return;
-    }
-
-    connection.query('UPDATE Products SET stock_quantity=stock_quantity + ? WHERE item_id=?',
-      [request.quantity, request.item_id], function (error, result) {
-      if (error) {
-        console.log(error)
-        connection.end();
-        return ;
-      }
-
-      console.log('\nUpdating Product is a SUCCESS!\n');
-
-      connection.query('SELECT item_id, product_name, price, stock_quantity FROM Products WHERE item_id=?', request.item_id, function(err, result) {
-        if (err) {
-          console.log(err)
-          connection.end();
-          return ;
-        }
-        displayProducts(result);
-        connection.end();
-      });
-
-    });
-  });
 }
 
 function createNewDepartment () {
@@ -171,7 +96,7 @@ function createNewDepartment () {
           connection.end();
           return;
         }
-
+        // Verify INSERT
         displayDepartmentsShort(result);
         connection.end();
       });
