@@ -27,6 +27,21 @@ function displayDepartments(result) {
   });
   console.log('+---------+----------------------+---------+-------------+-------------+');
 }
+function displayDepartmentsShort(result) {
+  var str;
+  var nameLength = 20;
+  
+
+  console.log('+---------+----------------------+---------+-------------+');
+  console.log('| dept_id | department_name      | overhead|product sales|');
+  console.log('+---------+----------------------+---------+-------------+');
+  result.forEach(function (item) {
+    str = printf('| %7d | %20s | %7d | % 11.2f |', item.department_id, my_util.pad(item.department_name, nameLength), item.overhead_cost, item.product_sales);
+    console.log(str);
+  });
+  console.log('+---------+----------------------+---------+-------------+');
+}
+
 function viewProductSales () {
   connection.query('SELECT department_id, department_name, overhead_cost, product_sales, (product_sales - overhead_cost) AS total_profit FROM Departments', function(err, result) {
     if (err) {
@@ -117,40 +132,18 @@ function addInventory (list) {
   });
 }
 
-function addNewProduct () {
+function createNewDepartment () {
 
   inquirer.prompt([
     {
       type: "input",
-      message: "New Item ID: ",
-      name: "item_id",
-    },
-    {
-      type: "input",
-      message: "New Product Name: ",
-      name: "product_name",
-    },
-    {
-      type: "input",
-      message: "New Product's Department Name: ",
+      message: "New Department Name: ",
       name: "department_name",
     },
     {
       type: "input",
-      message: "Price: ",
-      name: "price",
-      validate: function(value) {
-            if (isNaN(value) == false) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-    },
-    {
-      type: "input",
-      message: "Quantity: ",
-      name: "quantity",
+      message: "Department Overhead Cost: ",
+      name: "overhead_cost",
       validate: function(value) {
             if (isNaN(value) == false) {
                 return true;
@@ -160,12 +153,9 @@ function addNewProduct () {
         }
     }
   ]).then(function (request) {
-    connection.query('INSERT INTO Products SET ?',{
-     item_id: request.item_id.toUpperCase(),
-     product_name: request.product_name,
+    connection.query('INSERT INTO Departments SET ?',{
      department_name: request.department_name,
-     price: request.price,
-     stock_quantity: request.quantity
+     overhead_cost: request.overhead_cost
     }, function (error, result) {
       if (error) {
         console.log(error)
@@ -173,10 +163,16 @@ function addNewProduct () {
         return ;
       }
 
-      console.log('\nAdding New Product is a SUCCESS!\n');
+      console.log('\nAdding New Department is a SUCCESS!\n');
 
-      connection.query('SELECT item_id, product_name, price, stock_quantity FROM Products WHERE item_id=?', request.item_id, function(err, result) {
-        displayProducts(result);
+      connection.query('SELECT department_id, department_name, overhead_cost, product_sales FROM Departments WHERE department_name=?', request.department_name, function(err, result) {
+        if (err) {
+          console.error(err);
+          connection.end();
+          return;
+        }
+
+        displayDepartmentsShort(result);
         connection.end();
       });
 
@@ -184,10 +180,7 @@ function addNewProduct () {
   });
 
 }
-function createNewDeparment () {
-
-}
-
+//
 function askExecutiveInput () {
 
   inquirer.prompt([
@@ -205,7 +198,7 @@ function askExecutiveInput () {
         viewProductSales();
         break;
       case 'Create New Department':
-        createNewDeparment();
+        createNewDepartment();
         break;
  
     }

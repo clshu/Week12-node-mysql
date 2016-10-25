@@ -60,7 +60,7 @@ function askCustomerInput (list) {
       console.log('\nInvalid item_id: ' + request.item_id + '\n');
       askCustomerInput(list);
     } else {
-      connection.query('SELECT stock_quantity FROM Products WHERE item_id=?', request.item_id, function(err, result) {
+      connection.query('SELECT department_name, stock_quantity, price FROM Products WHERE item_id=?', request.item_id, function(err, result) {
         if (err) {
           console.error(err);
           connection.end();
@@ -70,12 +70,17 @@ function askCustomerInput (list) {
         originalResult = Object.assign({}, result[0]);
   
         remainingQuantity = result[0].stock_quantity - parseInt(request.quantity);
+        var sales = result[0].price * parseInt(request.quantity);
  
         if (remainingQuantity < 0) {
           console.log('\nInsufficient quantity! Request ' + request.quantity + ' units, only ' + result[0].stock_quantity + ' units available.\n');
           askCustomerInput(list);
         } else {
-          connection.query('UPDATE Products SET stock_quantity=? WHERE item_id=?', [remainingQuantity, request.item_id], function(err, updateResult) {
+          
+          var updateSQL = 'UPDATE Products, Departments ';
+          updateSQL += 'SET Products.stock_quantity = ?, Departments.product_sales =  Departments.product_sales + ? ';
+          updateSQL += 'WHERE Products.department_name = Departments.department_name AND Products.item_id = ? AND Departments.department_name = ?';
+          connection.query(updateSQL, [remainingQuantity, sales, request.item_id, result[0].department_name], function(err, updateResult) {
             if (err) {
               console.error(err);
               connection.end();
