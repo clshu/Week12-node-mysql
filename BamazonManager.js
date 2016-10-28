@@ -193,6 +193,31 @@ function addNewProduct () {
         }
     }
   ]).then(function (request) {
+    // Verify if Department exists,
+    // if not, abort and ask Executive to add it
+    connection.query('SELECT department_name FROM Departments WHERE department_name = ?', request.department_name, function(err, result) {
+      if (err) {
+          console.log(err)
+          connection.end();
+          return ;
+      }
+
+      if (result.length == 0) {
+        console.log('Department ' + request.department_name + ' does not exist.');
+        console.log('Ask Executives to Add It!');
+        connection.end();
+        return ;
+      } else {
+        // The department exists, the add product
+        insertIntoProducts(request);
+      }    
+    });
+
+  });
+
+}
+
+function insertIntoProducts(request) {
     // INSERT INTO Products table
     connection.query('INSERT INTO Products SET ?',{
      item_id: request.item_id.toUpperCase(),
@@ -216,7 +241,6 @@ function addNewProduct () {
       });
 
     });
-  });
 
 }
 
