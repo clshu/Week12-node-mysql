@@ -127,7 +127,7 @@ function createNewDepartment () {
 
 }
 //
-// Ask the execute which action to take by using inquirer
+// Ask the executive which action to take by using inquirer
 //
 function askExecutiveInput () {
 

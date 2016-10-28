@@ -208,7 +208,7 @@ function addNewProduct () {
         connection.end();
         return ;
       } else {
-        // The department exists, the add product
+        // The department exists, then add product
         insertIntoProducts(request);
       }    
     });
