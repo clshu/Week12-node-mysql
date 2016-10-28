@@ -3,7 +3,7 @@
 * config.sql
   * This files contains SQL for creating tables and load data.
 
-* department.csv, products.csv
+* departments.csv, products.csv
   * Data files for the tables
 
 * node-sql.mp4
