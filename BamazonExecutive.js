@@ -1,7 +1,7 @@
 const mysql     = require('mysql');
 const inquirer  = require('inquirer');
 const printf    = require('printf');
-const my_util   = require('./my_util');
+const my_util   = require('./my_util'); // Common code for all files
 
 var connection = mysql.createConnection({
   host     : 'localhost',
@@ -13,6 +13,11 @@ var connection = mysql.createConnection({
 
 // Functions
 
+//
+// Display Departments
+// Use printf to format the lines
+// total_profit is calculated on the fly
+//
 function displayDepartments(result) {
   var str;
   var nameLength = 20;
@@ -27,7 +32,11 @@ function displayDepartments(result) {
   });
   console.log('+---------+----------------------+---------+-------------+-------------+');
 }
-
+//
+// Display Departments in shorter form
+// Use printf to format the lines
+// This is to verify the Add Department result, so no total_profit, as it's not part of table
+// 
 function displayDepartmentsShort(result) {
   var str;
   var nameLength = 20;
@@ -43,6 +52,10 @@ function displayDepartmentsShort(result) {
   console.log('+---------+----------------------+---------+-------------+');
 }
 
+//
+// Get all rows in Departments table
+// total_profit is calculated on the fly by doing (product_sales - overhead_cost)
+//
 function viewProductSales () {
   connection.query('SELECT department_id, department_name, overhead_cost, product_sales, (product_sales - overhead_cost) AS total_profit FROM Departments', function(err, result) {
     if (err) {
@@ -50,15 +63,18 @@ function viewProductSales () {
         connection.end();
         return ;
     }
-
+    // Display result
     displayDepartments(result);
     connection.end();
   });
 
 }
 
+//
+// Create a new department in Departments table
+//
 function createNewDepartment () {
-
+  // Ask execute for the department_name and overhead_cost of the new department
   inquirer.prompt([
     {
       type: "input",
@@ -78,6 +94,11 @@ function createNewDepartment () {
         }
     }
   ]).then(function (request) {
+    //
+    // Insert new record with department_name and overhead_cost
+    // department_id is auto incremented, and product_sales is not updated by
+    // customers yet, so it will be default to 0.00
+    //
     connection.query('INSERT INTO Departments SET ?',{
      department_name: request.department_name,
      overhead_cost: request.overhead_cost
@@ -89,14 +110,14 @@ function createNewDepartment () {
       }
 
       console.log('\nAdding New Department is a SUCCESS!\n');
-
+      // Verify if the Addition is correct by searching its department_name
       connection.query('SELECT department_id, department_name, overhead_cost, product_sales FROM Departments WHERE department_name=?', request.department_name, function(err, result) {
         if (err) {
           console.error(err);
           connection.end();
           return;
         }
-        // Verify INSERT
+        // Display the new department
         displayDepartmentsShort(result);
         connection.end();
       });
@@ -105,6 +126,8 @@ function createNewDepartment () {
   });
 
 }
+//
+// Ask the execute which action to take by using inquirer
 //
 function askExecutiveInput () {
 
